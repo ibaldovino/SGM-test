@@ -1,0 +1,290 @@
+{% extends "layouts/base.html" %}
+{% load i18n %}
+{% load static %}
+{% block content %}
+    <!-- [ breadcrumb ] start -->
+    <!-- [ breadcrumb ] end -->
+    <div class="main-body">
+        <div class="page-wrapper">
+            <!-- [ Main Content ] start -->
+            <div class="row">
+                <!-- [ configuration table ] start -->
+                <div class="col-sm-12">
+                    <div class="card">
+                        <div class="card-block">
+                            {% include "includes/dj_filters.html" %}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div class="card">
+                        {% if add_button %}
+                            <div class="card-header">
+                                <button type="button" onclick="modal_add_object()"
+                                        class="float-right btn btn-icon btn-rounded btn-primary">
+                                    <i class="feather icon-plus"></i></button>
+                            </div>
+                        {% endif %}
+                        <div class="card-block">
+                            <div class="table-responsive">
+                                <table id="tblData" class="display table nowrap table-striped table-hover"
+                                       style="width:100%">
+
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--
+    <div class="content">
+        <div class="page-inner" style="padding-top: 5rem">
+
+            <div class="page-header">
+                <h4 class="page-title">{{ title }}</h4>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <div style="padding-top: 1%">
+                                {% include "includes/dj_filters.html" %}
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="tab-content mt-2 mb-3" id="pills">
+                                <div class="tab-pane fade show active" id="table_tab_1" role="tabpanel"
+                                     aria-labelledby="table_tab_1_nobd">
+                                    <table id="tblData" class="table table-striped"
+                                           style="width:100%; border-radius: 3px">
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    -->
+
+    {% block modal_add %}
+    {% endblock modal_add %}
+
+{% endblock content %}
+
+{% block javascripts %}
+
+    {% block fnDrawCallback %}
+        <script>
+            function fnDrawCallback(settings, json) {
+            }
+        </script>
+    {% endblock %}
+    {% block GetOrder %}
+        <script>
+            function getOrder(tableId) {
+                return [[0, "desc"]];
+            }
+        </script>
+    {% endblock %}
+    <script>
+        function capitalizeFirstLetter(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+
+        function formatColumns(columns) {
+            columns.forEach((c) => {
+                c.title = capitalizeFirstLetter(c.title.replaceAll("_", " "));
+                c.sTitle = c.title;
+            })
+            return columns
+        }
+
+        let
+            table;
+        let url = "{{ request.path }}";
+        $(document).ready(function () {
+
+            loadTable('tblData', "{{ api_url }}?format=datatables", formatColumns({{ columns|safe }}));
+            // Trigger redraw table when filer's search button is clicked
+            $('#applyFilters').click(function () {
+                table.draw();
+            });
+
+            $('form#filtersForm').keypress(function (ev) {
+                if (ev.which == 13) {
+                    $('#applyFilters').click();
+                }
+            });
+            $("#filtersForm").on("change", function () {
+                $('#tblData').DataTable().draw();
+                {% if t2api_url %}
+                    $('#tblData2').DataTable().draw();
+                {% endif %}
+            })
+
+            // Reset filters and redraw table when reset filters button is clicked
+            $('#resetFilters').click(function () {
+                $('#filtersForm').trigger('reset');
+
+                $(".select2").change();
+                $('#tblData').DataTable().draw();
+                {% if t2api_url %}
+                    $('#tblData2').DataTable().draw();
+                {% endif %}
+            });
+
+            // Export functionality: add the current filter values to the link href so that
+            // filters are applied
+            $('#export').click(function () {
+                let filtersData = $('#filtersForm').serializeArray();
+                filtersData.push({
+                    name: 'export',
+                    value: 1,
+                });
+                $(this).attr('href', '?' + $.param(filtersData));
+            });
+
+            $('.select2').select2({
+                dropdownCssClass: "form-control my_white",
+                selectionCssClass: "form-control"
+            });
+            $(".datetimepicker").datetimepicker({
+                format: 'DD/MM/YY HH:mm',
+            })
+
+        });
+
+        // server side table
+        function loadTable(table_id, api_url, columns) {
+            //let api_url = "{{ api_url }}?format=datatables";
+
+            table = $('#' + table_id).DataTable({
+                //language: {
+                //     url: "% static 'i18n/es.json' %}?v=1"
+                //},
+                order: getOrder(table_id),
+                scrollX: true,
+                dom: 'lrtpi',
+                responsive: true,
+                pagingType: 'numbers',
+                searching: false,
+                lengthChange: false,
+
+                serverSide: true,
+                processing: true,
+                paging: true,
+                pageLength: 12,
+                ajax: {
+                    url: api_url,
+                    type: 'GET',
+                    //dataSrc:
+                    data: function (d) {
+                        $('#filtersForm').serializeArray().map((filter) => {
+                            if ($('[name="' + filter.name + '"]').prop('multiple')) {
+                                if (typeof d[filter.name] === "undefined") {
+                                    d[filter.name] = filter.value
+                                } else {
+                                    d[filter.name] = d[filter.name] + ', ' + filter.value
+                                }
+                            } else {
+                                d[filter.name] = filter.value;
+                            }
+                        });
+                    },
+                    error: function (xhr, error, code) {
+                        let forbidden = 403;
+                        if (xhr.status === forbidden) {
+                            alert("The session expired. You must login again");
+                            window.location = "/login/";
+                        }
+                    }
+                },
+
+                columns: columns,
+
+                columnDefs: function () {
+                    getColumnDefs();
+                },
+                footerCallback: function () {
+                    footerCallback();
+                },
+
+                drawCallback: function (settings, json) {
+                    formatCells(table_id);
+                },
+                fnDrawCallback: function (settings, json) {
+                    fnDrawCallback(settings, json);
+                    formatCells(table_id);
+                }
+            });
+        }
+
+
+        function formatCells(table_id) {
+            $('#' + table_id + ' tr').each(function (i, row) {
+                $('td', this).each(function (j, cell) {
+
+                    const cellValue = cell.innerHTML;
+                    let number = parseFloat(cellValue);
+                    if (number.toString() === "NaN" || cellValue.indexOf("w") > -1 || cellValue.indexOf("/") > -1) {
+                        if (cellValue === 'true')
+                            cell.innerHTML = '<h4><span class="badge badge-success">{% trans "Yes" %}</span></h4>';
+
+                        else if (cellValue === 'false')
+                            cell.innerHTML = '<h4><span class="badge badge-danger">{% trans "No" %}</span></h4>';
+
+                        else if (cellValue === '')
+                            cell.innerHTML = '<span>  --------</span>';
+
+                    } else {
+                        cell.innerHTML = myFormatNumber(number, cellValue.indexOf("%") > -1)
+                    }
+
+                });
+            });
+        }
+
+    </script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            // Datetime picker hook
+            $('.form_date').datetimepicker({
+                language: 'es',
+                weekStart: 1,
+                todayBtn: 1,
+                autoclose: 1,
+                todayHighlight: 1,
+                startView: 2,
+                minView: 2,
+                forceParse: 0
+            });
+        });
+    </script>
+
+    {% block datatables_func %}
+        <script>
+            // placeholder for other views to override their specific details
+            // should be implemented in extra_javascripts block
+            getColumnDefs = () => {
+            };
+            footerCallback = () => {
+            };
+
+        </script>
+    {% endblock datatables_func %}
+
+    {% block extra_javascripts %}
+    {% endblock extra_javascripts %}
+{% endblock javascripts %}

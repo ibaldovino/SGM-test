@@ -1,0 +1,18 @@
+.select2-selection{
+    height: 45px!important;
+}
+.select2-selection__arrow{
+    padding-top: 40px;
+}
+.today:not(.active){
+    background-color: #04a9f5 !important;
+}
+.today .active{
+    background-color: #333f54 !important;
+}
+.select2-close-mask{
+    z-index: 2099;
+}
+.select2-dropdown{
+    z-index: 3051;
+}

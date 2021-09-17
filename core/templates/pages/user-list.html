@@ -1,0 +1,150 @@
+{% extends "layouts/list.html" %}
+{% load widget_tweaks %}
+{% load i18n %}
+{% block modal_add %}
+    <div class="modal fade" id="modal_add" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Add User</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">×</span></button>
+                </div>
+                <form id="form_save" action="">
+                    <div class="modal-body">
+                        {% csrf_token %}
+                        <input id="id_id" type="text" hidden value="" class="form-save-obj">
+                        {% for form in  form_add %}
+                            {% for f in  form %}
+                                <label for="{{ f.auto_id }}" class="bmd-label-static">{{ f.label }}</label>
+                                {{ f|add_class:"form-save-obj" }}
+                            {% endfor %}
+                        {% endfor %}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary"
+                                onclick="modal_add_object()">{% trans 'Close' %}</button>
+                        <button type="button" onclick="save_object()"
+                                class="btn btn-primary">{% trans 'Save' %}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="modal_del" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Del User</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span></button>
+                </div>
+                <br>
+                <input id="id_id_del" type="text" hidden value="">
+                <h5 class="text-center">{% trans 'User will be deleted are you sure?' %}</h5>
+                <br>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary"
+                            onclick="modal_del_object()">{% trans 'Close' %}</button>
+                    <button type="button" onclick="del_object()"
+                            class="btn btn-danger">{% trans 'Delete' %}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block extra_javascripts %}
+    {% block modal_extra_js %}
+        <script>
+            function validate_form() {
+            }
+        </script>
+    {% endblock %}
+
+    <script>
+        function modal_add_object(obj) {
+            $('.form-save-obj').val('')
+            $('.only_add').show();
+            if (obj !== undefined) {
+                $('.only_add').hide();
+                Object.keys(obj).forEach((k, i) => {
+                    $('.form-save-obj#' + k).val(obj[k]) // load obj data
+                })
+            }
+            $('.select2').select2();
+            $('#modal_add').modal('toggle');
+        }
+
+        function modal_del_object(pk) {
+            if (pk !== undefined){
+                $('#id_id_del').val(pk)
+            }
+            $('#modal_del').modal('toggle');
+        }
+
+        function save_object() {
+            $('.my_alert').remove();
+
+            let form = $('#form_save');
+            validate_form()
+            $.ajax({
+                type: "POST",
+                url: '{% url 'ajax-user-save' %}' + $('.form-save-obj#id_id').val(),
+                data: form.serialize(), // serializes the form's elements.
+                success: function (data) {
+                    if (data.status === 'Form Invalid') {
+                        data.errors.forEach((e) => {
+                            $(`<div class="my_alert alert alert-danger alert-dismissible fade show" role="alert">
+                                <h5 class="">${e.error}</h5>
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">×</span></button>
+                               </div>`).insertAfter('label[for="' + e.id + '"]')
+                        })
+
+                    } else if (data.status === 'Ok') {
+                        modal_add_object();
+
+                        //reload data
+                        $('#tblData').DataTable().draw();
+                        PNotify.success({
+                            title: gettext('Success'),
+                            text: gettext('user') + ' ' + gettext('save')
+                        });
+
+
+                    }
+                }
+            });
+
+        }
+
+        function del_object() {
+            $('.my_alert').remove();
+
+            $.ajax({
+                type: "POST",
+                url: '{% url 'ajax-user-delete' %}' + $('#id_id_del').val(),
+                headers: {'X-CSRFToken': $('[name=csrfmiddlewaretoken]').val()},
+                success: function (data) {
+                    if (data.status === 'Form Invalid') {
+
+                    } else if (data.status === 'Ok') {
+                        //reload data
+                        $('#tblData').DataTable().draw();
+                        PNotify.success({
+                            title: gettext('Success'),
+                            text: gettext('user') + ' ' + gettext('deleted')
+                        });
+                        modal_del_object();
+
+
+                    }
+                }
+            });
+
+        }
+
+    </script>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% load i18n %}
+
+
+<div class="row" style="padding-top: 7px">
+
+    <div class="col-md-3 mr-auto">
+
+        {% if show_add_button %}
+            <a class="btn btn-success" title='{{ add_button_text }}' style="color: white"
+                    {% if edit_href %}
+               href="{{ edit_href }}"
+                    {% else %}
+               onclick="edit_object()"
+                    {% endif %}
+            >
+                {% trans "new" %}
+            </a>
+
+        {% endif %}
+    </div>
+    <div class="col-md-2 text-right">
+
+        <button id="applyFilters" type="button" class="btn ripple btn-info">
+            <i class="feather icon-filter"></i> {% trans "Search" %}
+        </button>
+    </div>
+    <div class="col-lg-2 col-md-3 text-right">
+        <button id="resetFilters" type="button" class="btn ripple btn-tertiary">
+            <i class="feather icon-menu"></i> {% trans "Reset Filters" %}
+        </button>
+    </div>
+    {% if is_exportable %}
+        {% comment %}
+          href is set by javascript when button is clicked, parsing the filter form values
+        {% endcomment %}
+        <a href="" id="export" class="btn ripple btn-tertiary text-right" type="button">
+            <i class="icon-download"></i> {% trans "Export" %}
+        </a>
+    {% endif %}
+</div>

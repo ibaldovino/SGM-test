@@ -1,0 +1,47 @@
+version: '3.9'
+services:
+  nginx:
+    image: staticfloat/nginx-certbot
+    restart: always
+    container_name: nginx
+    environment:
+        CERTBOT_EMAIL: "${CERTBOT_EMAIL:-estebangaudenti1@gmail.com}"
+        ENVSUBST_VARS: FQDN
+        FQDN: "${FQDN}"
+    volumes:
+      - /volumes/sgm/staticfiles:/app/staticfiles/
+      - ./conf.d:/etc/nginx/user.conf.d:ro
+    ports:
+      - 80:80
+      - 443:443
+    depends_on:
+      - sgm_site
+    profiles:
+      - prod
+  sgm_site:
+    build: .
+    entrypoint: ./docker-entrypoint.sh
+    container_name: sgm_site
+    environment:
+      SECRET_KEY: "${SECRET_KEY:-please_change_me}"
+      DATABASE_URL: "postgres://${PG_USER:-postgres}:${PG_PASSWORD:-postgres}@${PG_HOST:-postgres}:${PG_PORT:-5432}/${PG_NAME:-sgm_db}"
+      ADMIN_EMAIL: "${ADMIN_EMAIL:-admin@admin.com}"
+      ADMIN_USERNAME: "${ADMIN_USERNAME:-admin}"
+      ADMIN_PASSWORD: "${ADMIN_PASSWORD:-admin}"
+
+    ports:
+      - 9990:9990
+    depends_on:
+      - postgres
+    volumes:
+      - /volumes/sgm/staticfiles:/app/staticfiles/
+  postgres:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: "${PG_PASSWORD:-postgres}"
+      POSTGRES_USER: "${PG_USER:-postgres}"
+      POSTGRES_DB: "${PG_NAME:-sgm_db}"
+    volumes:
+      - /volumes/sgm/pg-data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql

@@ -1,0 +1,56 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-08-18 19:48-0300\n"
+"PO-Revision-Date: 2021-08-18 19:48-0345\n"
+"Last-Translator: b'admin admin <admin@admin.com>'\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Translated-Using: django-rosetta 0.9.6\n"
+
+#: core/settings.py:93
+msgid "Spanish"
+msgstr "Español"
+
+#: core/templates/includes/ajax_form_controls.html:16
+msgid "new"
+msgstr "Nuevo"
+
+#: core/templates/includes/ajax_form_controls.html:24
+msgid "Search"
+msgstr "Buscar"
+
+#: core/templates/includes/ajax_form_controls.html:29
+msgid "Reset Filters"
+msgstr "Limpiar filtros"
+
+#: core/templates/includes/ajax_form_controls.html:38
+msgid "Export"
+msgstr "Exportar"
+
+#: core/templates/includes/sidebar.html:26
+msgid "Dashboard"
+msgstr "Dashboard"
+
+#: core/templates/includes/sidebar.html:33
+msgid "Logout"
+msgstr "Salir"
+
+#: core/templates/layouts/list.html:237
+msgid "Yes"
+msgstr "Si"
+
+#: core/templates/layouts/list.html:240
+msgid "No"
+msgstr "No"

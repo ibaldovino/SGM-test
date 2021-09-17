@@ -1,0 +1,44 @@
+{% load i18n %}
+{% load settings %}
+
+<nav class="pcoded-navbar">
+    <div class="navbar-wrapper">
+        <div class="navbar-brand header-logo">
+            <a target="_blank"
+               href="" class="b-brand">
+                <div class="">
+                    <img class="rounded-circle" src="{{ 'SIDEBAR_LOGO'|settings }}"
+                         style="max-height:50px;max-width:50px;width:100%">
+                </div>
+                <span class="b-title">{{ 'SIDEBAR_TITLE'|settings }}</span>
+            </a>
+            <a class="mobile-menu" id="mobile-collapse" href="javascript:"><span></span></a>
+        </div>
+        <div class="navbar-content scroll-div">
+            <ul class="nav pcoded-inner-navbar">
+                <li class="nav-item {% if 'index' in segment %} active {% endif %}">
+                    <a href="/" class="nav-link "><span class="pcoded-micon">
+                            <i class="feather icon-home"></i></span>
+                        <span class="pcoded-mtext">{% trans 'Dashboard' %}</span>
+                    </a>
+                </li>
+            {% if 'admin' in request.user.profile.role %}
+                {# entry here only if the user is any tipe of admin #}
+                <li class="nav-item {% if 'user' in request.path %} active {% endif %}">
+                    <a href="{% url 'page-user-list' %}" class="nav-link"><span class="pcoded-micon">
+                            <i class="feather icon-users"></i></span>
+                        <span class="pcoded-mtext">{% trans 'Users' %}</span>
+                    </a>
+                </li>
+            {% endif %}
+                <li data-username="Disabled Menu" class="nav-item">
+                    <a href="{% url 'logout' %}" class="nav-link">
+                            <span class="pcoded-micon">
+                                <i class="feather icon-power"></i></span>
+                        <span class="pcoded-mtext">{% trans 'Logout' %}</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

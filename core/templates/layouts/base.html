@@ -1,0 +1,136 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>
+        SGM - {% block title %}{% endblock %} |
+    </title>
+    <!-- HTML5 Shim and Respond.js IE10 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 10]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <!-- Meta -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <link rel="canonical" href="TODO add canonical">
+
+    <meta name="description" content="TODO ADD SGM DESCRIPTION"/>
+    <meta name="keywords" content="TODO keywords FOR INDEXED"/>
+    <meta name="author" content="SGM"/>
+    <!-- Favicon icon -->
+    <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
+    <link rel="stylesheet" href="{% static 'assets/plugins/bootstrap/css/bootstrap.min.css' %}">
+    <!-- fontawesome icon -->
+    <link rel="stylesheet" href="{% static 'assets/fonts/fontawesome/css/fontawesome-all.min.css' %}">
+    <!-- animation css -->
+    <link rel="stylesheet" href="{% static 'assets/plugins/animation/css/animate.min.css' %}">
+    <!-- extra css -->
+    <link rel="stylesheet" href="{% static 'assets/css/select2.min.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/plugins/datepicker/bootstrap-datetimepicker.min.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/plugins/pnotify/PNotify.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/plugins/pnotify/PNotifyBootstrap4.css' %}">
+    <!-- vendor css -->
+    <link rel="stylesheet" href="{% static 'assets/css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/custom.css' %}">
+    <!-- Specific CSS goes HERE -->
+    {% block stylesheets %}{% endblock stylesheets %}
+
+</head>
+
+<body>
+
+<!-- [ Pre-loader ] start -->
+<div class="loader-bg">
+    <div class="loader-track">
+        <div class="loader-fill"></div>
+    </div>
+</div>
+
+<!-- Top Bar -->
+{% include 'includes/navigation.html' %}
+
+<!-- SideBar -->
+{% include 'includes/sidebar.html' %}
+
+<div class="pcoded-main-container">
+    <div class="pcoded-wrapper">
+
+        <div class="pcoded-content">
+            <div class="pcoded-inner-content">
+                <div class="page-header">
+                    <div class="page-block">
+                        <div class="row align-items-center">
+                            <div class="col-md-12">
+                                <div class="page-header-title">
+                                    <h5 class="m-b-10">{{ title }}</h5>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% block content %}{% endblock content %}
+
+            </div>
+        </div>
+    </div>
+</div>
+
+{% include 'includes/scripts.html' %}
+<script>
+    const None = null;
+    const True = true;
+    const False = false;
+</script>
+
+<script>
+    function myFormatNumber(number, is_p = false, text_right = true) {
+        if (typeof number === 'string') {
+            is_p = number.indexOf('%') > -1 || is_p;
+            number = parseFloat(number);
+        }
+
+        let p = '';
+        number = (number).toLocaleString(undefined, {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2
+        })
+        if (is_p) {
+            p = '%'
+        }
+        let style = ''
+        if (text_right) {
+            style = 'float:right;'
+        }
+        return '<span style="' + style + '">' + number + p + '</span>'
+    }
+
+    $(document).ready(function () {
+        PNotify.defaultModules.set(PNotifyBootstrap4, {});
+        $(".datetimepicker").datetimepicker({
+            format: 'DD/MM/YY HH:mm',
+            locale: 'es',
+            icons: {
+                time: 'feather icon-clock',
+                date: 'feather icon-calendar',
+                up: 'feather icon-chevron-up',
+                down: 'feather icon-chevron-down',
+                previous: 'feather icon-chevron-left',
+                next: 'feather icon-chevron-right',
+                today: 'feather icon-calendar',
+                clear: 'feather icon-trash-2',
+                close: 'feather icon-x-circle'
+            }
+        });
+    });
+</script>
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}
+
+</body>
+</html>
